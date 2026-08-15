@@ -1,0 +1,17 @@
+schema: mcpg.dev/plugin/v1
+id: dev.mcpg.cache.redis
+name: Redis Cache
+license: Apache-2.0
+description: |
+  Redis-backed `cache` plugin. Serves any namespace via the
+  `{key_prefix}:{ns}:{key}` layout. All six trait ops map to
+  Redis commands; `incr` uses an atomic Lua script for
+  INCRBY + PEXPIRE.
+class: cache
+runtime: native-cdylib-v1
+protocol_version: "1.0"
+required_capabilities:
+  # Raw-TCP egress to Redis (added as a well-known capability in PR #84).
+  # Distinct from `network_outbound` so operators auditing egress
+  # can grant HTTP-only plugins a narrower capability set.
+  - network_outbound
