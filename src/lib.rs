@@ -621,6 +621,7 @@ impl RedisCache {
             resource: Some(format!("cache://{}/{}", PLUGIN_ID, ns)),
             outcome: AuditOutcome::Failure,
             request_id: None,
+            upstream_request_id: None,
             node_id: None,
             details,
             prev_event_hash: None,
