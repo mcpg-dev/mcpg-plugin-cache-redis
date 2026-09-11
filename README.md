@@ -37,7 +37,7 @@ plugins:
     source:
       path: ./plugins/libmcpg_plugin_cache_redis.so
       # or, platform-agnostic:
-      # oci: ghcr.io/mcpg-dev/source-code/plugins/cache-redis:protocol-1
+      # oci: ghcr.io/mcpg-dev/plugins/cache-redis
     granted_capabilities:
       - network_outbound
     config:
