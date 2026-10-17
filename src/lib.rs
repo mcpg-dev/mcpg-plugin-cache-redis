@@ -69,6 +69,16 @@ struct RedisCacheInner {
     host_handle: OnceLock<HostHandle>,
 }
 
+/// Install the crypto provider rustls builds TLS configurations from: a
+/// build that links both rustls providers has no default, and this
+/// cdylib's copy of rustls does not see the host's.
+fn install_crypto_provider() {
+    static INSTALL: std::sync::Once = std::sync::Once::new();
+    INSTALL.call_once(|| {
+        let _ = rustls::crypto::ring::default_provider().install_default();
+    });
+}
+
 impl RedisCache {
     /// Factory used by `declare_plugin!`. Panics on bad config —
     /// a misconfigured cache backend must not silently register;
@@ -76,6 +86,7 @@ impl RedisCache {
     /// panic into a host-visible "plugin failed to register" error
     /// referencing `plugin_id`.
     pub fn from_config_json(config_json: &str) -> Self {
+        install_crypto_provider();
         let config = RedisCacheConfig::parse(config_json).unwrap_or_else(|err| {
             tracing::error!(
                 plugin_id = PLUGIN_ID,
@@ -757,6 +768,12 @@ mod tests {
     #[test]
     fn factory_parses_minimal_config() {
         let _plugin = cheap_plugin();
+    }
+
+    #[test]
+    fn a_tls_configuration_can_be_built_once_the_plugin_is_made() {
+        let _plugin = cheap_plugin();
+        let _ = rustls::ClientConfig::builder();
     }
 
     #[test]
